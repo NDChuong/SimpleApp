@@ -1,5 +1,9 @@
 var createError = require('http-errors');
 var express = require('express');
+var exphbs = require('express-handlebars');
+var express_handlebars_sections = require('express-handlebars-sections');
+var bodyParser = require('body-parser');
+var wnumb = require('wnumb');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -9,16 +13,39 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+app.engine('hbs', exphbs({
+  defaultLayout: 'main',
+  layoutsDir: 'views/_layouts/',
+  helpers: {
+    section: express_handlebars_sections(),
+    number_format: n => {
+      var nf = wnumb({
+        thousand: ','
+      });
+      return nf.to(n);
+    }
+  }
+}));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'hbs');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
+app.use(handleLayoutMDW);
 
+app.get('/', (req, res)=>{
+  res.redirect('/home');
+});
+app.get('/home', homeControllers);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
