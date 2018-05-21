@@ -8,6 +8,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+
+var homeControllers = require('./controllers/homeControllers');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -40,14 +43,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
 }));
-app.use(handleLayoutMDW);
+
 
 app.get('/', (req, res)=>{
   res.redirect('/home');
 });
-app.get('/home', homeControllers);
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/home', homeControllers);
+// app.use('/', indexRouter);
+// app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
